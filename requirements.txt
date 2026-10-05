@@ -1,2 +1,4 @@
 pydantic
 langchain_core
+pypdf
+docx2txt

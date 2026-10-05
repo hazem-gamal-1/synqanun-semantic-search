@@ -1,20 +1,20 @@
 from pathlib import Path
 
 from langchain_community.document_loaders import (
+    Docx2txtLoader,
     PyPDFLoader,
     TextLoader,
-    UnstructuredWordDocumentLoader,
 )
+from functools import partial
 
-from ..models.schemas import Document, DocumentSegment
+from models.schemas import Document, DocumentSegment
 
 
 class DocumentLoader:
     LOADERS = {
         ".pdf": PyPDFLoader,
-        ".txt": TextLoader,
-        ".doc": UnstructuredWordDocumentLoader,
-        ".docx": UnstructuredWordDocumentLoader,
+        ".txt": partial(TextLoader, encoding="utf-8"),
+        ".docx": Docx2txtLoader,
     }
 
     def load(self, file_path: str | Path) -> Document:
