@@ -2,3 +2,4 @@
 *.pdf
 *.txt
 *__pycache__*
+test.py

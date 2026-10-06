@@ -9,6 +9,10 @@ from functools import partial
 
 from models.schemas import Document, DocumentSegment
 
+import hashlib
+
+document_id = content_hash
+
 
 class DocumentLoader:
     LOADERS = {
@@ -24,6 +28,7 @@ class DocumentLoader:
         loader_class = self.LOADERS.get(extension)
         loader = loader_class(str(path))
         loaded_documents = loader.load()
+       
 
         segments = []
         for index, loaded_document in enumerate(loaded_documents):
@@ -43,8 +48,11 @@ class DocumentLoader:
                 )
             )
 
+        content_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        document_id = content_hash
+
         return Document(
-            id=path.stem,
+            id=document_id,
             title=path.stem,
             segments=segments,
             metadata={
