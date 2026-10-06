@@ -20,6 +20,7 @@ BATCH_SIZE = _cfg["upsert_batch_size"]
 client = QdrantClient(
     url=os.environ["QDRANT_URL"],
     api_key=os.environ["QDRANT_API_KEY"],
+    timeout=_cfg["timeout_seconds"],
 )
 
 
@@ -134,7 +135,6 @@ class VectorStore:
         score_threshold: float | None = None,
     ) -> list[tuple[DocumentChunk, str | None, float]]:
 
- 
         response = self.client.query_points(
             collection_name=self.collection_name,
             query=query_vector,
