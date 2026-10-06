@@ -1,8 +1,12 @@
+fastapi
+uvicorn
+python-multipart
 pydantic
-langchain_core
+pyyaml
+python-dotenv
+qdrant-client
+sentence-transformers
+langchain-text-splitters
+langchain-community
 pypdf
 docx2txt
-langchain_text_splitters
-sentence-transformers
-qdrant-client
-python-dotenv
