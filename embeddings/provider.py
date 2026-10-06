@@ -3,11 +3,9 @@ from sentence_transformers import SentenceTransformer
 
 
 class EmbeddingProvider:
-    """Generates embeddings for documents and queries."""
-
     def __init__(
         self,
-        model_name: str = "intfloat/multilingual-e5-small",
+        model_name: str = "BAAI/bge-m3",
     ):
         self.model = SentenceTransformer(model_name)
 
@@ -15,9 +13,10 @@ class EmbeddingProvider:
         """Generate embeddings for document chunks."""
 
         embeddings = self.model.encode(
-            [f"passage: {text}" for text in texts],
+            texts,
             normalize_embeddings=True,
             convert_to_numpy=True,
+            show_progress_bar=True,
         )
 
         return embeddings.tolist()
@@ -26,7 +25,7 @@ class EmbeddingProvider:
         """Generate an embedding for a search query."""
 
         embedding = self.model.encode(
-            f"query: {query}",
+            query,
             normalize_embeddings=True,
             convert_to_numpy=True,
         )
