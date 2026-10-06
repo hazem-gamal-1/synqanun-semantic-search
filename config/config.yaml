@@ -1,0 +1,17 @@
+embedding:
+  model_name: BAAI/bge-m3
+  vector_size: 1024       
+chunking:
+  chunk_size: 1200         
+  chunk_overlap: 150
+vector_store:
+  collection_name: legal_chunks
+  distance: cosine         
+  upsert_batch_size: 128
+retrieval:
+  default_top_k: 5        
+  max_top_k: 50
+  chunk_overfetch: 5       
+ranking:
+  support_weight: 0.1
+  max_chunks_per_document: 3
