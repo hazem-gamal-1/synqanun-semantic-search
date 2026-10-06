@@ -4,3 +4,5 @@ pypdf
 docx2txt
 langchain_text_splitters
 sentence-transformers
+qdrant-client
+python-dotenv
