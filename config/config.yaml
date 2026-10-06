@@ -1,6 +1,6 @@
 embedding:
-  model_name: BAAI/bge-m3
-  vector_size: 1024        
+  model_name: intfloat/multilingual-e5-small
+  vector_size: 384        
 
 chunking:
   chunk_size: 1200         
