@@ -4,7 +4,7 @@ import uuid
 from qdrant_client import QdrantClient, models
 from dotenv import load_dotenv
 
-from config import get_config
+from utils.helpers import get_config
 from models.schemas import DocumentChunk
 
 load_dotenv()
