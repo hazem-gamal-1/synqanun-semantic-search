@@ -1,14 +1,17 @@
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from utils.helpers import get_config
 from models.schemas import Document, DocumentChunk
+
+_cfg = get_config()["chunking"]
 
 
 class DocumentChunker:
     def __init__(
         self,
-        chunk_size: int = 1200,
-        chunk_overlap: int = 150):
+        chunk_size: int = _cfg["chunk_size"],
+        chunk_overlap: int = _cfg["chunk_overlap"],
+    ):
 
         self.chunk_size = chunk_size
 
