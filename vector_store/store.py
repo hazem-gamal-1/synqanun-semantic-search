@@ -24,8 +24,6 @@ client = QdrantClient(
 
 
 class VectorStore:
-    """Stores chunk embeddings in Qdrant and runs top-K similarity search."""
-
     def __init__(
         self,
         qdrant_client: QdrantClient = client,
@@ -74,12 +72,6 @@ class VectorStore:
         document_title: str | None = None,
         batch_size: int = BATCH_SIZE,
     ) -> int:
-        """
-        Store chunks with their embeddings.
-
-        Re-ingesting the same chunk overwrites it (idempotent), because the
-        point id is derived deterministically from the chunk id.
-        """
 
         if len(chunks) != len(vectors):
             raise ValueError(
@@ -141,13 +133,8 @@ class VectorStore:
         top_k: int = 20,
         score_threshold: float | None = None,
     ) -> list[tuple[DocumentChunk, str | None, float]]:
-        """
-        Top-K chunk-level similarity search.
 
-        Returns (chunk, document_title, score) tuples, best first.
-        Document-level aggregation is done by the retrieval layer.
-        """
-
+ 
         response = self.client.query_points(
             collection_name=self.collection_name,
             query=query_vector,
