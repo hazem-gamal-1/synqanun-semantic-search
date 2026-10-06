@@ -2,7 +2,7 @@ import tempfile
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
-from config import get_config
+from utils.helpers import get_config
 from ingestion.chunker import DocumentChunker
 from ingestion.loader import DocumentLoader
 from models.schemas import SearchResponse
