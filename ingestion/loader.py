@@ -1,17 +1,12 @@
 from pathlib import Path
-
 from langchain_community.document_loaders import (
     Docx2txtLoader,
     PyPDFLoader,
     TextLoader,
 )
 from functools import partial
-
 from models.schemas import Document, DocumentSegment
-
 import hashlib
-
-document_id = content_hash
 
 
 class DocumentLoader:
