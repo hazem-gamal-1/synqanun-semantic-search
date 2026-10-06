@@ -41,7 +41,7 @@ def search(
 
 @app.post("/documents")
 def upload_document(file: UploadFile = File(...)) -> dict:
-    """Upload a .pdf / .txt / .docx file and index it."""
+    """Upload a .pdf / .txt / .docx file ."""
 
     name = Path(file.filename or "").name
     if Path(name).suffix.lower() not in loader.LOADERS:

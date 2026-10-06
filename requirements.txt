@@ -10,3 +10,4 @@ langchain-text-splitters
 langchain-community
 pypdf
 docx2txt
+pytest
