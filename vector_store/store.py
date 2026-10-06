@@ -1,13 +1,21 @@
 import os
 import uuid
+
 from qdrant_client import QdrantClient, models
-from models.schemas import DocumentChunk
 from dotenv import load_dotenv
+
+from config import get_config
+from models.schemas import DocumentChunk
+
 load_dotenv()
 
-VECTOR_SIZE = 1024
-COLLECTION_NAME = "legal_chunks"
+_emb = get_config()["embedding"]
+_cfg = get_config()["vector_store"]
 
+VECTOR_SIZE = _emb["vector_size"]
+COLLECTION_NAME = _cfg["collection_name"]
+DISTANCE = models.Distance[_cfg["distance"].upper()]
+BATCH_SIZE = _cfg["upsert_batch_size"]
 
 client = QdrantClient(
     url=os.environ["QDRANT_URL"],
@@ -16,6 +24,8 @@ client = QdrantClient(
 
 
 class VectorStore:
+    """Stores chunk embeddings in Qdrant and runs top-K similarity search."""
+
     def __init__(
         self,
         qdrant_client: QdrantClient = client,
@@ -27,6 +37,8 @@ class VectorStore:
         self.vector_size = vector_size
         self.ensure_collection()
 
+    # ------------------------------------------------------------------ setup
+
     def ensure_collection(self) -> None:
         """Create the collection (and payload indexes) if it does not exist."""
 
@@ -37,18 +49,22 @@ class VectorStore:
             collection_name=self.collection_name,
             vectors_config=models.VectorParams(
                 size=self.vector_size,
-                distance=models.Distance.COSINE,
+                distance=DISTANCE,
             ),
         )
 
+        # Needed for fast delete/filter by document.
         self.client.create_payload_index(
             collection_name=self.collection_name,
             field_name="document_id",
             field_schema=models.PayloadSchemaType.KEYWORD,
         )
 
+    # ----------------------------------------------------------------- writes
+
     @staticmethod
     def _point_id(chunk_id: str) -> str:
+        """Qdrant IDs must be UUIDs or ints; derive a stable UUID from the chunk id."""
         return str(uuid.uuid5(uuid.NAMESPACE_URL, chunk_id))
 
     def upsert_chunks(
@@ -56,8 +72,14 @@ class VectorStore:
         chunks: list[DocumentChunk],
         vectors: list[list[float]],
         document_title: str | None = None,
-        batch_size: int = 128,
+        batch_size: int = BATCH_SIZE,
     ) -> int:
+        """
+        Store chunks with their embeddings.
+
+        Re-ingesting the same chunk overwrites it (idempotent), because the
+        point id is derived deterministically from the chunk id.
+        """
 
         if len(chunks) != len(vectors):
             raise ValueError(
@@ -94,6 +116,8 @@ class VectorStore:
         return len(points)
 
     def delete_document(self, document_id: str) -> None:
+        """Remove every chunk belonging to a document (e.g. before re-indexing)."""
+
         self.client.delete(
             collection_name=self.collection_name,
             points_selector=models.FilterSelector(
@@ -109,13 +133,20 @@ class VectorStore:
             wait=True,
         )
 
+    # ------------------------------------------------------------------ reads
+
     def search(
         self,
         query_vector: list[float],
         top_k: int = 20,
         score_threshold: float | None = None,
     ) -> list[tuple[DocumentChunk, str | None, float]]:
+        """
+        Top-K chunk-level similarity search.
 
+        Returns (chunk, document_title, score) tuples, best first.
+        Document-level aggregation is done by the retrieval layer.
+        """
 
         response = self.client.query_points(
             collection_name=self.collection_name,
