@@ -5,7 +5,7 @@ from models.schemas import DocumentChunk
 from dotenv import load_dotenv
 load_dotenv()
 
-VECTOR_SIZE = 384
+VECTOR_SIZE = 1024
 COLLECTION_NAME = "legal_chunks"
 
 
